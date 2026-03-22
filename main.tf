@@ -64,7 +64,7 @@ resource "azurerm_network_interface" "practicesaz305" {
 }
 
 resource "azurerm_windows_virtual_machine" "practicesaz305" {
-  name                = "practicesaz305-machine"
+  name                = var.name
   resource_group_name = azurerm_resource_group.practicesaz305.name
   location            = azurerm_resource_group.practicesaz305.location
   size                = "Standard_F2"
@@ -104,7 +104,7 @@ resource "azurerm_mssql_database" "practicesaz305" {
   license_type = "LicenseIncluded"
   max_size_gb  = 2
   sku_name     = "S0"
- # enclave_type = "VBS"
+  # enclave_type = "VBS"
 
   tags = {
     foo = "bar"
@@ -112,6 +112,6 @@ resource "azurerm_mssql_database" "practicesaz305" {
 
   # prevent the possibility of accidental data loss
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
 }

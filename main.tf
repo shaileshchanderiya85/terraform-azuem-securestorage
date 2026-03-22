@@ -15,6 +15,7 @@ locals {
 }
 
 
+
 resource "azurerm_storage_account" "securestorage" {
   name                     = var.storage_account_name
   resource_group_name      = var.resource_group_name
@@ -23,6 +24,11 @@ resource "azurerm_storage_account" "securestorage" {
   account_replication_type = "LRS"
 
   tags = local.tags
+}
+
+
+provider "azurerm" {
+  features {}
 }
 
 resource "azurerm_resource_group" "practicesaz305" {
@@ -78,5 +84,34 @@ resource "azurerm_windows_virtual_machine" "practicesaz305" {
     offer     = "WindowsServer"
     sku       = "2016-Datacenter"
     version   = "latest"
+  }
+}
+
+
+resource "azurerm_mssql_server" "practicesaz305" {
+  name                         = "practicesaz305-sqlserver"
+  resource_group_name          = azurerm_resource_group.practicesaz305.name
+  location                     = azurerm_resource_group.practicesaz305.location
+  version                      = "12.0"
+  administrator_login          = "4dm1n157r470r"
+  administrator_login_password = "4-v3ry-53cr37-p455w0rd"
+}
+
+resource "azurerm_mssql_database" "practicesaz305" {
+  name         = "practicesaz305-db"
+  server_id    = azurerm_mssql_server.practicesaz305.id
+  collation    = "SQL_Latin1_General_CP1_CI_AS"
+  license_type = "LicenseIncluded"
+  max_size_gb  = 2
+  sku_name     = "S0"
+ # enclave_type = "VBS"
+
+  tags = {
+    foo = "bar"
+  }
+
+  # prevent the possibility of accidental data loss
+  lifecycle {
+    prevent_destroy = true
   }
 }
